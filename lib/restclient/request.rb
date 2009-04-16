@@ -164,29 +164,9 @@ module RestClient
     end
 
     def process_result(res)
-      if res.code =~ /\A2\d{2}\z/ 
-        # We don't decode raw requests
-        unless @raw_response
-          decode res['content-encoding'], res.body if res.body
-        end
-      elsif %w(301 302 303).include? res.code
-        url = res.header['Location']
-
-        if url !~ /^http/
-          uri = URI.parse(@url)
-          uri.path = "/#{url}".squeeze('/')
-          url = uri.to_s
-        end
-
-        "Redirected to: #{url}"
-      elsif res.code == "304"
-        "Not Modified"
-      elsif res.code == "401"
-        "Unauthorized"
-      elsif res.code == "404"
-        "Not Found"
-      else
-        "Failed"
+      # We don't decode raw requests
+      unless @raw_response
+        decode res['content-encoding'], res.body if res.body
       end
     end
 

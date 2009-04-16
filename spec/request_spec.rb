@@ -206,35 +206,24 @@ describe RestClient::Request do
     RestClient::Request.execute(1 => 2)
   end
 
-  it "raises a Redirect with the new location when the response is in the 30x range" do
-    res = mock('response', :code => '301', :header => { 'Location' => 'http://new/resource' })
-    @request.process_result(res).should == 'Redirected to: http://new/resource'
+  it "handles a 301" do
+    res = mock('response', :code => '301', :body => 'body', :[] => nil)
+    @request.process_result(res).should == res.body
   end
 
-  it "handles redirects with relative paths" do
-    res = mock('response', :code => '301', :header => { 'Location' => 'index' })
-    @request.process_result(res).should == 'Redirected to: http://some/index'
+  it "handle a 401" do
+    res = mock('response', :code => '401', :body => 'body', :[] => nil)
+    @request.process_result(res).should == res.body
   end
 
-  it "handles redirects with absolute paths" do
-    @request.instance_variable_set('@url', 'http://some/place/else')
-    res = mock('response', :code => '301', :header => { 'Location' => '/index' })
-    @request.process_result(res).should == 'Redirected to: http://some/index'
+  it "handle a 404" do
+    res = mock('response', :code => '404', :body => 'body', :[] => nil)
+    @request.process_result(res).should == res.body
   end
 
-  it "raises Unauthorized when the response is 401" do
-    res = mock('response', :code => '401')
-    @request.process_result(res).should == "Unauthorized"
-  end
-
-  it "raises ResourceNotFound when the response is 404" do
-    res = mock('response', :code => '404')
-    @request.process_result(res).should == 'Not Found'
-  end
-
-  it "raises RequestFailed otherwise" do
-    res = mock('response', :code => '500')
-    @request.process_result(res).should == "Failed"
+  it "handle a 500" do
+    res = mock('response', :code => '500', :body => 'body', :[] => nil)
+    @request.process_result(res).should == res.body
   end
 
   it "creates a proxy class if a proxy url is given" do
