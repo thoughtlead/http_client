@@ -62,12 +62,7 @@ end
 
 def method_missing(s, *args, &b)
   super unless r.respond_to?(s)
-  begin
-    r.send(s, *args, &b)
-  rescue RestClient::RequestFailed => e
-    print STDERR, e.response.body
-    raise e
-  end
+  r.send(s, *args, &b)
 end
 
 require 'irb'
