@@ -194,6 +194,11 @@ describe RestClient::Request do
     lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(RestClient::ServerBrokeConnection)
   end
 
+  it "catches Errno::ECONNREFUSED and shows the more informative ConnectionRefused" do
+    @http.stub!(:request).and_raise(Errno::ECONNREFUSED)
+    lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(RestClient::ConnectionRefused)
+  end
+
   it "class method execute wraps constructor" do
     req = mock("rest request")
     RestClient::Request.should_receive(:new).with(1 => 2).and_return(req)

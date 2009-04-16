@@ -124,6 +124,8 @@ module RestClient
       raise RestClient::ServerBrokeConnection
     rescue Timeout::Error
       raise RestClient::RequestTimeout
+    rescue Errno::ECONNREFUSED
+      raise RestClient::ConnectionRefused
     end
 
     def setup_credentials(req)

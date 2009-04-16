@@ -31,4 +31,9 @@ module RestClient
   class RequestTimeout < Exception
     ErrorMessage = 'Request timed out'
   end
+
+  # The server refused the connection
+  class ConnectionRefused < Exception
+    ErrorMessage = 'Server refused connection'
+  end
 end
