@@ -178,15 +178,15 @@ module RestClient
           url = uri.to_s
         end
 
-        raise Redirect, url
+        "Redirected to: #{url}"
       elsif res.code == "304"
-        raise NotModified, res
+        "Not Modified"
       elsif res.code == "401"
-        raise Unauthorized, res
+        "Unauthorized"
       elsif res.code == "404"
-        raise ResourceNotFound, res
+        "Not Found"
       else
-        raise RequestFailed, res
+        "Failed"
       end
     end
 
