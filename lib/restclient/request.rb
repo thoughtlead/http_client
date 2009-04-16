@@ -36,13 +36,6 @@ module RestClient
     end
 
     def execute
-      execute_inner
-    rescue Redirect => e
-      @url = e.url
-      execute
-    end
-
-    def execute_inner
       uri = parse_url_with_auth(url)
       transmit uri, net_http_request_class(method).new(uri.request_uri, make_headers(headers)), payload
     end

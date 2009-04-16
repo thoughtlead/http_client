@@ -116,7 +116,7 @@ describe RestClient::Request do
     @request.should_receive(:net_http_request_class).with(:put).and_return(klass)
     klass.should_receive(:new).and_return('result')
     @request.should_receive(:transmit).with(@uri, 'result', 'payload')
-    @request.execute_inner
+    @request.execute
   end
 
   it "transmits the request with Net::HTTP" do
@@ -192,11 +192,6 @@ describe RestClient::Request do
   it "catches EOFError and shows the more informative ServerBrokeConnection" do
     @http.stub!(:request).and_raise(EOFError)
     lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(RestClient::ServerBrokeConnection)
-  end
-
-  it "execute calls execute_inner" do
-    @request.should_receive(:execute_inner)
-    @request.execute
   end
 
   it "class method execute wraps constructor" do
