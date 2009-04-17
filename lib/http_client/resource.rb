@@ -1,36 +1,36 @@
-module RestClient
-  # A class that can be instantiated for access to a RESTful resource,
+module HttpClient
+  # A class that can be instantiated for access to a HTTPful resource,
   # including authentication.
   #
   # Example:
   #
-  #   resource = RestClient::Resource.new('http://some/resource')
+  #   resource = HttpClient::Resource.new('http://some/resource')
   #   jpg = resource.get(:accept => 'image/jpg')
   #
   # With HTTP basic authentication:
   #
-  #   resource = RestClient::Resource.new('http://protected/resource', :user => 'user', :password => 'password')
+  #   resource = HttpClient::Resource.new('http://protected/resource', :user => 'user', :password => 'password')
   #   resource.delete
   #
   # With a timeout (seconds):
   #
-  #   RestClient::Resource.new('http://slow', :timeout => 10)
+  #   HttpClient::Resource.new('http://slow', :timeout => 10)
   #
   # With an open timeout (seconds):
   #
-  #   RestClient::Resource.new('http://behindfirewall', :open_timeout => 10)
+  #   HttpClient::Resource.new('http://behindfirewall', :open_timeout => 10)
   #
   # You can also use resources to share common headers. For headers keys,
   # symbols are converted to strings. Example:
   #
-  #   resource = RestClient::Resource.new('http://some/resource', :headers => { :client_version => 1 })
+  #   resource = HttpClient::Resource.new('http://some/resource', :headers => { :client_version => 1 })
   #
   # This header will be transported as X-Client-Version (notice the X prefix,
   # capitalization and hyphens)
   #
   # Use the [] syntax to allocate subresources:
   #
-  #   site = RestClient::Resource.new('http://example.com', :user => 'adam', :password => 'mypasswd')
+  #   site = HttpClient::Resource.new('http://example.com', :user => 'adam', :password => 'mypasswd')
   #   site['posts/1/comments'].post 'Good article.', :content_type => 'text/plain'
   #
   class Resource
@@ -107,14 +107,14 @@ module RestClient
     #
     # Example:
     #
-    #   site = RestClient::Resource.new('http://example.com', 'adam', 'mypasswd')
+    #   site = HttpClient::Resource.new('http://example.com', 'adam', 'mypasswd')
     #   site['posts/1/comments'].post 'Good article.', :content_type => 'text/plain'
     #
     # This is especially useful if you wish to define your site in one place and
     # call it in multiple locations:
     #
     #   def orders
-    #     RestClient::Resource.new('http://example.com/orders', 'admin', 'mypasswd')
+    #     HttpClient::Resource.new('http://example.com/orders', 'admin', 'mypasswd')
     #   end
     #
     #   orders.get                     # GET http://example.com/orders
@@ -123,7 +123,7 @@ module RestClient
     #
     # Nest resources as far as you want:
     #
-    #   site = RestClient::Resource.new('http://example.com')
+    #   site = HttpClient::Resource.new('http://example.com')
     #   posts = site['posts']
     #   first_post = posts['1']
     #   comments = first_post['comments']

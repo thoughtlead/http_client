@@ -1,8 +1,8 @@
 require File.dirname(__FILE__) + '/base'
 
-describe RestClient::Request do
+describe HttpClient::Request do
   before do
-    @request = RestClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload')
+    @request = HttpClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload')
 
     @uri = mock("uri")
     @uri.stub!(:request_uri).and_return('/resource')
@@ -74,7 +74,7 @@ describe RestClient::Request do
 
   it "doesn't overwrite user and password (which may have already been set by the Resource constructor) if there is no user/password in the url" do
     URI.stub!(:parse).and_return(mock('uri', :user => nil, :password => nil))
-    @request = RestClient::Request.new(:method => 'get', :url => 'example.com', :user => 'beth', :password => 'pass2')
+    @request = HttpClient::Request.new(:method => 'get', :url => 'example.com', :user => 'beth', :password => 'pass2')
     @request.parse_url_with_auth('http://example.com/resource')
     @request.user.should == 'beth'
     @request.password.should == 'pass2'
@@ -82,7 +82,7 @@ describe RestClient::Request do
 
   it "correctly formats cookies provided to the constructor" do
     URI.stub!(:parse).and_return(mock('uri', :user => nil, :password => nil))
-    @request = RestClient::Request.new(:method => 'get', :url => 'example.com', :cookies => {:session_id => '1' })
+    @request = HttpClient::Request.new(:method => 'get', :url => 'example.com', :cookies => {:session_id => '1' })
     @request.should_receive(:default_headers).and_return({'foo' => 'bar'})
     headers = @request.make_headers({}).should == { 'Foo' => 'bar', 'Cookie' => 'session_id=1'}
   end
@@ -191,19 +191,19 @@ describe RestClient::Request do
 
   it "catches EOFError and shows the more informative ServerBrokeConnection" do
     @http.stub!(:request).and_raise(EOFError)
-    lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(RestClient::ServerBrokeConnection)
+    lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(HttpClient::ServerBrokeConnection)
   end
 
   it "catches Errno::ECONNREFUSED and shows the more informative ConnectionRefused" do
     @http.stub!(:request).and_raise(Errno::ECONNREFUSED)
-    lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(RestClient::ConnectionRefused)
+    lambda { @request.transmit(@uri, 'req', nil) }.should raise_error(HttpClient::ConnectionRefused)
   end
 
   it "class method execute wraps constructor" do
-    req = mock("rest request")
-    RestClient::Request.should_receive(:new).with(1 => 2).and_return(req)
+    req = mock("http request")
+    HttpClient::Request.should_receive(:new).with(1 => 2).and_return(req)
     req.should_receive(:execute)
-    RestClient::Request.execute(1 => 2)
+    HttpClient::Request.execute(1 => 2)
   end
 
   it "handles a 301" do
@@ -227,7 +227,7 @@ describe RestClient::Request do
   end
 
   it "creates a proxy class if a proxy url is given" do
-    RestClient.stub!(:proxy).and_return("http://example.com/")
+    HttpClient.stub!(:proxy).and_return("http://example.com/")
     @request.net_http_class.should include(Net::HTTP::ProxyDelta)
   end
 
@@ -236,23 +236,23 @@ describe RestClient::Request do
   end
 
   it "logs a get request" do
-    RestClient::Request.new(:method => :get, :url => 'http://url').request_log.should ==
-    'RestClient.get "http://url"'
+    HttpClient::Request.new(:method => :get, :url => 'http://url').request_log.should ==
+    'HttpClient.get "http://url"'
   end
 
   it "logs a post request with a small payload" do
-    RestClient::Request.new(:method => :post, :url => 'http://url', :payload => 'foo').request_log.should ==
-    'RestClient.post "http://url", "foo"'
+    HttpClient::Request.new(:method => :post, :url => 'http://url', :payload => 'foo').request_log.should ==
+    'HttpClient.post "http://url", "foo"'
   end
 
   it "logs a post request with a large payload" do
-    RestClient::Request.new(:method => :post, :url => 'http://url', :payload => ('x' * 1000)).request_log.should ==
-    'RestClient.post "http://url", "(1000 byte payload)"'
+    HttpClient::Request.new(:method => :post, :url => 'http://url', :payload => ('x' * 1000)).request_log.should ==
+    'HttpClient.post "http://url", "(1000 byte payload)"'
   end
 
   it "logs input headers as a hash" do
-    RestClient::Request.new(:method => :get, :url => 'http://url', :headers => { :accept => 'text/plain' }).request_log.should ==
-    'RestClient.get "http://url", :accept=>"text/plain"'
+    HttpClient::Request.new(:method => :get, :url => 'http://url', :headers => { :accept => 'text/plain' }).request_log.should ==
+    'HttpClient.get "http://url", :accept=>"text/plain"'
   end
 
   it "logs a response including the status code, content type, and result body size in bytes" do
@@ -274,27 +274,27 @@ describe RestClient::Request do
   end
 
   it "displays the log to stdout" do
-    RestClient.stub!(:log).and_return('stdout')
+    HttpClient.stub!(:log).and_return('stdout')
     STDOUT.should_receive(:puts).with('xyz')
     @request.display_log('xyz')
   end
 
   it "displays the log to stderr" do
-    RestClient.stub!(:log).and_return('stderr')
+    HttpClient.stub!(:log).and_return('stderr')
     STDERR.should_receive(:puts).with('xyz')
     @request.display_log('xyz')
   end
 
   it "append the log to the requested filename" do
-    RestClient.stub!(:log).and_return('/tmp/restclient.log')
+    HttpClient.stub!(:log).and_return('/tmp/http_client.log')
     f = mock('file handle')
-    File.should_receive(:open).with('/tmp/restclient.log', 'a').and_yield(f)
+    File.should_receive(:open).with('/tmp/http_client.log', 'a').and_yield(f)
     f.should_receive(:puts).with('xyz')
     @request.display_log('xyz')
   end
 
   it "set read_timeout" do
-    @request = RestClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload', :timeout => 123)
+    @request = HttpClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload', :timeout => 123)
     @http.stub!(:request)
     @request.stub!(:process_result)
     @request.stub!(:response_log)
@@ -305,7 +305,7 @@ describe RestClient::Request do
   end
 
   it "set open_timeout" do
-    @request = RestClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload', :open_timeout => 123)
+    @request = HttpClient::Request.new(:method => :put, :url => 'http://some/resource', :payload => 'payload', :open_timeout => 123)
     @http.stub!(:request)
     @request.stub!(:process_result)
     @request.stub!(:response_log)
@@ -328,7 +328,7 @@ describe RestClient::Request do
   end
 
   it "should not set net.verify_mode to OpenSSL::SSL::VERIFY_NONE if verify_ssl is true" do
-    @request = RestClient::Request.new(:method => :put, :url => 'https://some/resource', :payload => 'payload', :verify_ssl => true)
+    @request = HttpClient::Request.new(:method => :put, :url => 'https://some/resource', :payload => 'payload', :verify_ssl => true)
     @net.should_not_receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
     @http.stub!(:request)
     @request.stub!(:process_result)
@@ -341,7 +341,7 @@ describe RestClient::Request do
   end
 
   it "should set the ssl_client_cert if provided" do
-    @request = RestClient::Request.new(
+    @request = HttpClient::Request.new(
       :method => :put, 
       :url => 'https://some/resource', 
       :payload => 'payload',
@@ -355,7 +355,7 @@ describe RestClient::Request do
   end
 
   it "should not set the ssl_client_cert if it is not provided" do
-    @request = RestClient::Request.new(
+    @request = HttpClient::Request.new(
       :method => :put, 
       :url => 'https://some/resource', 
       :payload => 'payload'
@@ -372,7 +372,7 @@ describe RestClient::Request do
   end
 
   it "should set the ssl_client_key if provided" do
-    @request = RestClient::Request.new(
+    @request = HttpClient::Request.new(
       :method => :put, 
       :url => 'https://some/resource', 
       :payload => 'payload',
@@ -386,7 +386,7 @@ describe RestClient::Request do
   end
 
   it "should not set the ssl_client_key if it is not provided" do
-    @request = RestClient::Request.new(
+    @request = HttpClient::Request.new(
       :method => :put, 
       :url => 'https://some/resource', 
       :payload => 'payload'
@@ -403,7 +403,7 @@ describe RestClient::Request do
   end
 
   it "should set the ssl_ca_file if provided" do
-    @request = RestClient::Request.new(
+    @request = HttpClient::Request.new(
       :method => :put, 
       :url => 'https://some/resource', 
       :payload => 'payload',
@@ -417,7 +417,7 @@ describe RestClient::Request do
   end
 
   it "should not set the ssl_ca_file if it is not provided" do
-    @request = RestClient::Request.new(
+    @request = HttpClient::Request.new(
       :method => :put, 
       :url => 'https://some/resource', 
       :payload => 'payload'

@@ -4,11 +4,11 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "rest-client"
-    gem.summary = %Q{Simple REST client for Ruby, inspired by microframework syntax for specifying actions.}
-    gem.email = "adam@heroku.com"
-    gem.homepage = "http://rest-client.heroku.com/"
-    gem.authors = ["Adam Wiggins"]
+    gem.name = "http_client"
+    gem.summary = %Q{Simple HTTP/REST client for Ruby, inspired by microframework syntax for specifying actions. Forked from RestClient http://rest-client.heroku.com see README for reasons}
+    gem.email = "nate@sevenwire.com"
+    gem.homepage = "http://github.com/sevenwire/http_client"
+    gem.authors = ["Adam Wiggins", "Nate Sutton"]
 
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
@@ -41,7 +41,7 @@ Rake::RDocTask.new do |rdoc|
   end
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "rest-client #{version}"
+  rdoc.title = "http-client #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end

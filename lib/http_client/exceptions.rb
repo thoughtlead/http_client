@@ -1,13 +1,13 @@
-module RestClient
-  # This is the base RestClient exception class. Rescue it if you want to
+module HttpClient
+  # This is the base HttpClient exception class. Rescue it if you want to
   # catch any exception that your request might raise
-  class Exception < RuntimeError
+  class Exception < StandardError
     def message(default=nil)
       self.class::ErrorMessage
     end
   end
 
-  # Base RestClient exception when there's a response available
+  # Base HttpClient exception when there's a response available
   class ExceptionWithResponse < Exception
     attr_accessor :response
 

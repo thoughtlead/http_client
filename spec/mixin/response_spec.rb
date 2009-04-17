@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../base'
 
 class MockResponse
-  include RestClient::Mixin::Response
+  include HttpClient::Mixin::Response
 
   def initialize(body, res)
     @net_http_res = res
@@ -9,7 +9,7 @@ class MockResponse
   end
 end
 
-describe RestClient::Mixin::Response do
+describe HttpClient::Mixin::Response do
   before do
     @net_http_res = mock('net http response')
     @response = MockResponse.new('abc', @net_http_res)
@@ -21,12 +21,12 @@ describe RestClient::Mixin::Response do
   end
 
   it "beautifies the headers by turning the keys to symbols" do
-    h = RestClient::Response.beautify_headers('content-type' => [ 'x' ])
+    h = HttpClient::Response.beautify_headers('content-type' => [ 'x' ])
     h.keys.first.should == :content_type
   end
 
   it "beautifies the headers by turning the values to strings instead of one-element arrays" do
-    h = RestClient::Response.beautify_headers('x' => [ 'text/html' ] )
+    h = HttpClient::Response.beautify_headers('x' => [ 'text/html' ] )
     h.values.first.should == 'text/html'
   end
 

@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/base'
 
-describe RestClient::RawResponse do
+describe HttpClient::RawResponse do
   before do
     @tf = mock("Tempfile", :read => "the answer is 42", :open => true)
     @net_http_res = mock('net http response')
-    @response = RestClient::RawResponse.new(@tf, @net_http_res)
+    @response = HttpClient::RawResponse.new(@tf, @net_http_res)
   end
 
   it "behaves like string" do

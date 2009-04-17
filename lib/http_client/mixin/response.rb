@@ -1,9 +1,9 @@
-module RestClient
+module HttpClient
   module Mixin
     module Response
       attr_reader :net_http_res
 
-      # HTTP status code, always 200 since RestClient throws exceptions for
+      # HTTP status code, always 200 since HttpClient throws exceptions for
       # other codes.
       def code
         @code ||= @net_http_res.code.to_i
@@ -27,14 +27,14 @@ module RestClient
       end
 
       def self.included(receiver)
-        receiver.extend(RestClient::Mixin::Response::ClassMethods)
+        receiver.extend(HttpClient::Mixin::Response::ClassMethods)
       end
 
       module ClassMethods
         def beautify_headers(headers)
           headers.inject({}) do |out, (key, value)|
             out[key.gsub(/-/, '_').to_sym] = value.first
-          out
+            out
           end
         end
       end

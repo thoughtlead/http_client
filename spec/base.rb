@@ -1,4 +1,4 @@
 require 'rubygems'
 require 'spec'
 
-require File.dirname(__FILE__) + '/../lib/restclient'
+require File.dirname(__FILE__) + '/../lib/http_client'

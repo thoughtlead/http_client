@@ -1,11 +1,11 @@
 require 'tempfile'
 
-module RestClient
-  # This class is used internally by RestClient to send the request, but you can also
+module HttpClient
+  # This class is used internally by HttpClient to send the request, but you can also
   # access it internally if you'd like to use a method not directly supported by the
   # main API.  For example:
   #
-  #   RestClient::Request.execute(:method => :head, :url => 'http://example.com')
+  #   HttpClient::Request.execute(:method => :head, :url => 'http://example.com')
   #
   class Request
     attr_reader :method, :url, :payload, :headers,
@@ -52,8 +52,8 @@ module RestClient
     end
 
     def net_http_class
-      if RestClient.proxy
-        proxy_uri = URI.parse(RestClient.proxy)
+      if HttpClient.proxy
+        proxy_uri = URI.parse(HttpClient.proxy)
         Net::HTTP::Proxy(proxy_uri.host, proxy_uri.port, proxy_uri.user, proxy_uri.password)
       else
         Net::HTTP
@@ -121,11 +121,11 @@ module RestClient
         end
       end
     rescue EOFError
-      raise RestClient::ServerBrokeConnection
+      raise HttpClient::ServerBrokeConnection
     rescue Timeout::Error
-      raise RestClient::RequestTimeout
+      raise HttpClient::RequestTimeout
     rescue Errno::ECONNREFUSED
-      raise RestClient::ConnectionRefused
+      raise HttpClient::ConnectionRefused
     end
 
     def setup_credentials(req)
@@ -137,7 +137,7 @@ module RestClient
         # Taken from Chef, which as in turn...
         # Stolen from http://www.ruby-forum.com/topic/166423
         # Kudos to _why!
-        @tf = Tempfile.new("rest-client") 
+        @tf = Tempfile.new("http-client") 
         size, total = 0, http_response.header['Content-Length'].to_i
         http_response.read_body do |chunk|
           @tf.write(chunk) 
@@ -177,7 +177,7 @@ module RestClient
 
     def request_log
       out = []
-      out << "RestClient.#{method} #{url.inspect}"
+      out << "HttpClient.#{method} #{url.inspect}"
       out << (payload.size > 100 ? "(#{payload.size} byte payload)".inspect : payload.inspect) if payload
       out << headers.inspect.gsub(/^\{/, '').gsub(/\}$/, '') unless headers.empty?
       out.join(', ')
@@ -189,7 +189,7 @@ module RestClient
     end
 
     def display_log(msg)
-      return unless log_to = RestClient.log
+      return unless log_to = HttpClient.log
 
       if log_to == 'stdout'
         STDOUT.puts msg

@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
 $:.unshift File.dirname(__FILE__) + "/../lib"
-require 'restclient'
+require 'http_client'
 
 require "yaml"
 
 def usage(why = nil)
   puts "failed for reason: #{why}" if why
-  puts "usage: restclient [get|put|post|delete] url|name [username] [password]"
+  puts "usage: http_client [get|put|post|delete] url|name [username] [password]"
   puts "  The verb is optional, if you leave it off you'll get an interactive shell."
   puts "  put and post both take the input body on stdin."
   exit(1)
@@ -21,7 +21,7 @@ end
 
 @url = ARGV.shift || 'http://localhost:4567'
 
-config = YAML.load(File.read(ENV['HOME'] + "/.restclient")) rescue {}
+config = YAML.load(File.read(ENV['HOME'] + "/.http_client")) rescue {}
 
 @url, @username, @password = if c = config[@url]
   [c['url'], c['username'], c['password']]
@@ -33,7 +33,7 @@ usage("invalid url '#{@url}") unless @url =~ /^https?/
 usage("too few args") unless ARGV.size < 3
 
 def r
-  @r ||= RestClient::Resource.new(@url, @username, @password)
+  @r ||= HttpClient::Resource.new(@url, @username, @password)
 end
 
 r # force rc to load
@@ -46,7 +46,7 @@ if @verb
       puts r.send(@verb)
     end
     exit 0
-  rescue RestClient::Exception => e
+  rescue HttpClient::Exception => e
     puts e.response.body if e.respond_to? :response
     raise
   end
@@ -72,7 +72,7 @@ if File.exists? ".irbrc"
   ENV['IRBRC'] = ".irbrc"
 end
 
-if File.exists?(rcfile = "~/.restclientrc")
+if File.exists?(rcfile = "~/.http_clientrc")
   load(rcfile)
 end
 
